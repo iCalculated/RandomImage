@@ -7,3 +7,11 @@ edition = "2018"
 [dependencies]
 image = "0.22.1"
 rand = "0.7.0"
+criterion = "0.2.11"
+
+[dev-dependencies]
+criterion = "0.2"
+
+[[bench]]
+name = "number_gen_bench"
+harness = false
