@@ -1,6 +1,5 @@
 extern crate rand;
 use rand::Rng;
-use rand::distributions::{Distribution, Uniform};
 use std::env;
 use image::{ImageBuffer, Pixel, Rgb};
 
