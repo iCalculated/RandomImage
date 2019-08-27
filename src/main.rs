@@ -21,9 +21,7 @@ fn main() {
     };
 
     let mut rng = rand::thread_rng();
-    let uniform = Uniform::from(1..255);
     let mut img = ImageBuffer::new(width,height);
-    let mut comp = ImageBuffer::new(width,height);
     for x in 0..width {
         for y in 0..height {
             let (r,g,b): (u8,u8,u8) = rng.gen::<(u8, u8, u8)>();
