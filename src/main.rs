@@ -1,33 +1,40 @@
 extern crate rand;
-use rand::Rng;
+// _ is the wildcard symbol, like a * import in Python
+// when I used an "as _" it failed to find the function:
+// error[E0425]: cannot find function `thread_rng` in this scope
+use rand::Rng as _;
+use rand::thread_rng;
 use std::env;
-use image::{ImageBuffer, Pixel, Rgb};
+use image::{ImageBuffer, Rgb};
+
+fn extract_arg_int(arg: Option<&String>, default: u32) -> u32 {
+    // and_then is a flat map to prevent nested Options
+    // I don't understand how a closure differs from a lambda
+    // but for each value it sets arg to the flattened (right term?)
+    // result.
+    // unwrap_or is nicer than match for checking Option status
+    arg.and_then(|arg| arg.parse().ok())
+        .unwrap_or(default)
+}
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    // _ implies type, so definition can be more succint
+    let args: Vec<_> = env::args().collect();
 
-    let (width, height) = if args.len() == 3 {
-        (match args[1].parse::<u32>() {
-            Ok(num) => num,
-            Err(_) => 1920,
-        },
-        match args[2].parse::<u32>() {
-            Ok(num) => num,
-            Err(_) => 1080,
-        })
-    }
-    else {
-        (1920, 1080)
-    };
+    // No longer a matching mess
+    let width = extract_arg_int(args.get(1), 1920);
+    let height = extract_arg_int(args.get(2), 1080);
 
-    let mut rng = rand::thread_rng();
     let mut img = ImageBuffer::new(width,height);
-    for x in 0..width {
-        for y in 0..height {
-            let (r,g,b): (u8,u8,u8) = rng.gen::<(u8, u8, u8)>();
-            let pxl = Rgb::from_channels(r,g,b,0);
-            img.put_pixel(x, y, pxl);
-        }
+    let mut rng = thread_rng();
+
+    // entirely forgot rust has mutable iteration
+    for pixel in img.pixels_mut() {
+        *pixel = Rgb(rng.gen());
     }
-    let _ = img.save("output.png");
+
+    // unwrap the result instead of sending it to the void
+    // if there is an error it will panic
+    img.save("output.png").unwrap();
 }
+
